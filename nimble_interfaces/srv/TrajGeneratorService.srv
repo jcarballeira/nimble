@@ -1,4 +1,4 @@
 nimble_interfaces/Measurements measurements
 nimble_interfaces/TherapyRequirements therapy_requirements
 ---
-trajectory_msgs/JointTrajectory joints_target
+nimble_interfaces/JointsTrajectory joints_trajectory

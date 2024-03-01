@@ -18,6 +18,7 @@ using namespace std::chrono_literals;
 struct SharedData {
 
     nimble_interfaces::msg::CartesianTrajectory cart_target;
+    nimble_interfaces::msg::CartesianTrajectory cart_state;
     nimble_interfaces::msg::TherapyRequirements step_target;
     nimble_interfaces::msg::FrameState frame_state;
     sensor_msgs::msg::JointState cables_state;
@@ -42,6 +43,13 @@ public:
                 // Callback function
                 call_back_carTarget(msg);
             });
+            
+        subscriber_cartState = create_subscription<nimble_interfaces::msg::CartesianTrajectory>(
+            "cartesian_target", 10,
+            [this](const nimble_interfaces::msg::CartesianTrajectory msg) {
+                // Callback function
+                call_back_carState(msg);
+            });    
             
         subscriber_stepTarget = create_subscription<nimble_interfaces::msg::TherapyRequirements>(
             "step_target", 10,
@@ -84,6 +92,7 @@ private:
     //Instancias
     SharedData	shared_data_;    //estructura de datos
     rclcpp::Subscription<nimble_interfaces::msg::CartesianTrajectory>::SharedPtr subscriber_cartTarget; //susbcriptores
+    rclcpp::Subscription<nimble_interfaces::msg::CartesianTrajectory>::SharedPtr subscriber_cartState;
     rclcpp::Subscription<nimble_interfaces::msg::TherapyRequirements>::SharedPtr subscriber_stepTarget;
     rclcpp::Subscription<nimble_interfaces::msg::FrameState>::SharedPtr subscriber_framestate;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr subscriber_cablestate;
@@ -97,6 +106,13 @@ private:
     void call_back_carTarget(const nimble_interfaces::msg::CartesianTrajectory & cart_target_msg)
     {
 	shared_data_.cart_target = cart_target_msg;  //almacenamiento del mensaje en la estructura de datos
+        processData();  //llamada a la funcion de procesamiento
+        
+    }
+    
+    void call_back_carState(const nimble_interfaces::msg::CartesianTrajectory & cart_state_msg)
+    {
+	shared_data_.cart_state = cart_state_msg;  //almacenamiento del mensaje en la estructura de datos
         processData();  //llamada a la funcion de procesamiento
         
     }

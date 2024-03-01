@@ -8,20 +8,20 @@
 #include "nimble_interfaces/msg/measurements.hpp"
 #include "nimble_interfaces/msg/therapy_requirements.hpp"
 #include "nimble_interfaces/srv/traj_generator_service.hpp"
-
+#include "nimble_interfaces/msg/joints_trajectory.hpp"
 #include <memory>
 
 // Function to convert a JointTrajectory message to a string
-std::string jointTrajectoryToString(const trajectory_msgs::msg::JointTrajectory::SharedPtr& joint_trajectory) {
+std::string jointTrajectoryToString(const nimble_interfaces::msg::JointsTrajectory::SharedPtr& joints_trajectory) {
     std::stringstream ss;
 
     ss << "Joint Names: ";
-    for (const auto& joint_name : joint_trajectory->joint_names) {
+    for (const auto& joint_name : joints_trajectory->joint_trajectory.joint_names) {
         ss << joint_name << " ";
     }
     ss << std::endl;
 
-    for (const auto& point : joint_trajectory->points) {
+    for (const auto& point : joints_trajectory->joint_trajectory.points) {
         ss << "Point:" << std::endl;
         ss << "  Positions: ";
         for (const auto& position : point.positions) {
@@ -43,11 +43,11 @@ void generate_trajectory(const std::shared_ptr<nimble_interfaces::srv::TrajGener
    
   // Create a JointTrajectory message
     //std::shared_ptr<trajectory_msgs::msg::JointTrajectory> joint_trajectory;  
-    auto joint_trajectory = std::make_shared<trajectory_msgs::msg::JointTrajectory>();
+    auto joints_trajectory = std::make_shared<nimble_interfaces::msg::JointsTrajectory>();
     
     
     // Set the joint names
-    joint_trajectory->joint_names = {"hipR", "kneeR", "ankleR","hipL", "kneeL", "ankleL"};
+    joints_trajectory->joint_trajectory.joint_names = {"hipR", "kneeR", "ankleR","hipL", "kneeL", "ankleL"};
 
     // Create two trajectory points
     trajectory_msgs::msg::JointTrajectoryPoint point1;
@@ -66,14 +66,14 @@ void generate_trajectory(const std::shared_ptr<nimble_interfaces::srv::TrajGener
     point2.time_from_start = rclcpp::Duration(1, 0);
 
     // Add the two points to the trajectory
-    joint_trajectory->points.push_back(point1);
-    joint_trajectory->points.push_back(point2);
+    joints_trajectory->joint_trajectory.points.push_back(point1);
+    joints_trajectory->joint_trajectory.points.push_back(point2);
     
     
     RCLCPP_INFO(rclcpp::get_logger("joint_trajectory_publisher"), "JointTrajectory message:\n%s",
-        jointTrajectoryToString(joint_trajectory).c_str());
+        jointTrajectoryToString(joints_trajectory).c_str());
 
-    response->joints_target = *joint_trajectory;                 
+    response->joints_trajectory = *joints_trajectory;                 
   
 }
 

@@ -50,7 +50,14 @@ def generate_launch_description():
             emulate_tty=True,
             
         ),
-                
+        Node(
+            package="nimble",
+            executable="gait_control",
+            name="gait_control",
+            output="screen",
+            emulate_tty=True,
+            
+        ),        
         Node(
             package="nimble",
             executable="control_MSD",

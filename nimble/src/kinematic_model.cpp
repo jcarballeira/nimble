@@ -8,7 +8,7 @@
 #include "nimble_interfaces/msg/measurements.hpp"
 #include "nimble_interfaces/msg/therapy_requirements.hpp"
 #include "nimble_interfaces/msg/cartesian_trajectory.hpp"
-#include "trajectory_msgs/msg/joint_trajectory.hpp"
+#include "nimble_interfaces/msg/joints_trajectory.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 
 
@@ -17,7 +17,8 @@ using namespace std::chrono_literals;
 //Estructura compartida para almacenar datos al recibir cada topic
 struct SharedData {
     nimble_interfaces::msg::Measurements measurements;
-    trajectory_msgs::msg::JointTrajectory joints_target;
+    nimble_interfaces::msg::JointsTrajectory joints_trajectory;
+    nimble_interfaces::msg::JointsTrajectory joints_target;
     sensor_msgs::msg::JointState joints_state;
     sensor_msgs::msg::JointState cables_state;
 
@@ -34,12 +35,19 @@ public:
     	this->declare_parameter("param2", 2);
     	
         // Create a subscribers 
-        subscriber_joints_target = create_subscription<trajectory_msgs::msg::JointTrajectory>(
+        subscriber_joints_trajectory = create_subscription<nimble_interfaces::msg::JointsTrajectory>(
+            "joints_trajectory", 10,
+            [this](const nimble_interfaces::msg::JointsTrajectory msg) {
+                // Callback function that publishes the received Int64 message
+                call_back_joints_trajectory(msg);
+            });
+            
+        subscriber_joints_target = create_subscription<nimble_interfaces::msg::JointsTrajectory>(
             "joints_target", 10,
-            [this](const trajectory_msgs::msg::JointTrajectory msg) {
+            [this](const nimble_interfaces::msg::JointsTrajectory msg) {
                 // Callback function that publishes the received Int64 message
                 call_back_joints_target(msg);
-            });
+            });    
             
         subscriber_joints_state = create_subscription<sensor_msgs::msg::JointState>(
             "joints_state", 10,
@@ -65,9 +73,9 @@ public:
         
         // Create a publishers
         publisher_stepTarget = create_publisher<nimble_interfaces::msg::TherapyRequirements>("step_target", 10);
-        publisher_cartTarget = create_publisher<nimble_interfaces::msg::CartesianTrajectory>("cartesian_target", 10);
+        publisher_cartTrajectory = create_publisher<nimble_interfaces::msg::CartesianTrajectory>("cartesian_trajectory", 10);
         publisher_cartState = create_publisher<nimble_interfaces::msg::CartesianTrajectory>("cartesian_state", 10);
-        
+        publisher_jointAccState = create_publisher<nimble_interfaces::msg::JointsTrajectory>("joints_acc_state", 10);
         //Create wall timer to publish periodically (eliminar si no se usa)
         timer_ = this->create_wall_timer(1000ms, std::bind(&KinematicModelNode::timer_callback, this)); 
     }
@@ -76,19 +84,28 @@ private:
     //Instancias	
     SharedData	shared_data_;    //estructura de datos
     //Subscribers	
-    rclcpp::Subscription<trajectory_msgs::msg::JointTrajectory>::SharedPtr subscriber_joints_target;
+    rclcpp::Subscription<nimble_interfaces::msg::JointsTrajectory>::SharedPtr subscriber_joints_trajectory;
+    rclcpp::Subscription<nimble_interfaces::msg::JointsTrajectory>::SharedPtr subscriber_joints_target;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr subscriber_joints_state;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr subscriber_state_cables;
     rclcpp::Subscription<nimble_interfaces::msg::Measurements>::SharedPtr subscriber_measurements;
     //Publishers
-    rclcpp::Publisher<nimble_interfaces::msg::CartesianTrajectory>::SharedPtr publisher_cartTarget;
+    rclcpp::Publisher<nimble_interfaces::msg::CartesianTrajectory>::SharedPtr publisher_cartTrajectory;
+    rclcpp::Publisher<nimble_interfaces::msg::JointsTrajectory>::SharedPtr publisher_jointAccState;   
     rclcpp::Publisher<nimble_interfaces::msg::CartesianTrajectory>::SharedPtr publisher_cartState;
     rclcpp::Publisher<nimble_interfaces::msg::TherapyRequirements>::SharedPtr publisher_stepTarget;
     rclcpp::TimerBase::SharedPtr timer_; //timer (eliminar si no se usa)
     
     
     //Callbacks, funciones asociadas a la recepcion de cada topic	        
-    void call_back_joints_target(const trajectory_msgs::msg::JointTrajectory & joint_target_msg) 
+    void call_back_joints_trajectory(const nimble_interfaces::msg::JointsTrajectory & joint_trajectory_msg) 
+    {
+        shared_data_.joints_trajectory = joint_trajectory_msg;  //almacenamiento del mensaje en la estructura de datos
+        processData();  //llamada a la funcion de procesamiento
+        
+    }
+    
+    void call_back_joints_target(const nimble_interfaces::msg::JointsTrajectory & joint_target_msg) 
     {
         shared_data_.joints_target = joint_target_msg;  //almacenamiento del mensaje en la estructura de datos
         processData();  //llamada a la funcion de procesamiento

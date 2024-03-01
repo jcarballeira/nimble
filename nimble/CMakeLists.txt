@@ -19,6 +19,9 @@ ament_target_dependencies(hmi rclcpp nimble_interfaces)
 add_executable(kinematic_model src/kinematic_model.cpp)
 ament_target_dependencies(kinematic_model rclcpp nimble_interfaces sensor_msgs trajectory_msgs)
 
+add_executable(gait_control src/gait_control.cpp)
+ament_target_dependencies(gait_control rclcpp nimble_interfaces sensor_msgs trajectory_msgs)
+
 add_executable(states_machine src/states_machine.cpp)
 ament_target_dependencies(states_machine rclcpp nimble_interfaces sensor_msgs trajectory_msgs std_msgs)
 
@@ -26,7 +29,7 @@ add_executable(control_ZMP src/control_ZMP.cpp)
 ament_target_dependencies(control_ZMP rclcpp nimble_interfaces sensor_msgs trajectory_msgs)
 
 add_executable(control_MSD src/control_MSD.cpp)
-ament_target_dependencies(control_MSD rclcpp std_msgs sensor_msgs trajectory_msgs)
+ament_target_dependencies(control_MSD rclcpp nimble_interfaces std_msgs sensor_msgs trajectory_msgs)
 
 add_executable(cables_robot src/cables_robot.cpp)
 ament_target_dependencies(cables_robot rclcpp sensor_msgs)
@@ -43,6 +46,7 @@ ament_target_dependencies(traj_generator_server rclcpp nimble_interfaces)
 install(TARGETS
   hmi
   kinematic_model
+  gait_control
   control_ZMP
   control_MSD
   cables_robot

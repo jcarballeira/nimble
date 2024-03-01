@@ -13,6 +13,7 @@
 #include "nimble_interfaces/msg/therapy_requirements.hpp"
 #include "nimble_interfaces/msg/frame_state.hpp"
 #include "nimble_interfaces/msg/cartesian_trajectory.hpp"
+#include "nimble_interfaces/msg/joints_trajectory.hpp"
 #include "trajectory_msgs/msg/joint_trajectory.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
 
@@ -23,10 +24,10 @@ using namespace std::chrono_literals;
 
 //Estructura compartida para almacenar datos al recibir cada topic
 struct SharedData {
-    trajectory_msgs::msg::JointTrajectory joints_target;
-    nimble_interfaces::msg::CartesianTrajectory cartesian_target;
+    nimble_interfaces::msg::JointsTrajectory joints_trajectory;
+    nimble_interfaces::msg::CartesianTrajectory cartesian_trajectory;
     nimble_interfaces::msg::CartesianTrajectory cartesian_state;
-    sensor_msgs::msg::JointState joints_state;
+    nimble_interfaces::msg::JointsTrajectory joints_acc_state;
     sensor_msgs::msg::JointState cables_state;
     nimble_interfaces::msg::TherapyRequirements step_target;
     nimble_interfaces::msg::TherapyRequirements therapy_requirements;
@@ -69,18 +70,18 @@ public:
     	
         // Create a subscribers 
                     
-        subscriber_joints_state = create_subscription<sensor_msgs::msg::JointState>(
-            "joints_state", 10,
-            [this](const sensor_msgs::msg::JointState msg) {
+        subscriber_joints_acc_state = create_subscription<nimble_interfaces::msg::JointsTrajectory>(
+            "joints_acc_state", 10,
+            [this](const nimble_interfaces::msg::JointsTrajectory msg) {
                 // Callback function that publishes the received Int64 message
-                call_back_joints_state(msg);
+                call_back_joints_acc_state(msg);
             }); 
                     
-       suscriber_cartesian_target = create_subscription<nimble_interfaces::msg::CartesianTrajectory>(
-            "cartesian_target", 10,
+       suscriber_cartesian_trajectory = create_subscription<nimble_interfaces::msg::CartesianTrajectory>(
+            "cartesian_trajectory", 10,
             [this](const nimble_interfaces::msg::CartesianTrajectory msg) {
                 
-                call_back_cartesian_target(msg);
+                call_back_cartesian_trajectory(msg);
             }); 
        suscriber_cartesian_state = create_subscription<nimble_interfaces::msg::CartesianTrajectory>(
             "cartesian_state", 10,
@@ -133,7 +134,7 @@ public:
         
         // Create publisher for topics
         
-        publisher_joints_target = create_publisher<trajectory_msgs::msg::JointTrajectory>("joints_target", 10);
+        publisher_joints_trajectory = create_publisher<nimble_interfaces::msg::JointsTrajectory>("joints_trajectory", 10);
         publisher_assistLevel = create_publisher<std_msgs::msg::Int32MultiArray>("assistLevel", 10);
         publisher_executionMode = create_publisher<std_msgs::msg::Int32MultiArray>("executionMode", 10);
         publisher_controlMode = create_publisher<std_msgs::msg::Int16>("controlMode", 10);
@@ -156,8 +157,8 @@ private:
     rclcpp::TimerBase::SharedPtr timer_;	 //timer
     SharedData	shared_data_; //estructura de datos
     //Subscribers
-    rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr subscriber_joints_state;
-    rclcpp::Subscription<nimble_interfaces::msg::CartesianTrajectory>::SharedPtr suscriber_cartesian_target;
+    rclcpp::Subscription<nimble_interfaces::msg::JointsTrajectory>::SharedPtr subscriber_joints_acc_state;
+    rclcpp::Subscription<nimble_interfaces::msg::CartesianTrajectory>::SharedPtr suscriber_cartesian_trajectory;
     rclcpp::Subscription<nimble_interfaces::msg::CartesianTrajectory>::SharedPtr suscriber_cartesian_state;
     rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr subscriber_state_cables;
     rclcpp::Subscription<nimble_interfaces::msg::TherapyRequirements>::SharedPtr suscriber_step_target;
@@ -166,24 +167,24 @@ private:
     rclcpp::Subscription<std_msgs::msg::Float32MultiArray>::SharedPtr suscriber_interaction_torque;
     rclcpp::Subscription<std_msgs::msg::ByteMultiArray>::SharedPtr suscriber_FSR;
     //Publishers
-    rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr publisher_joints_target;
+    rclcpp::Publisher<nimble_interfaces::msg::JointsTrajectory>::SharedPtr publisher_joints_trajectory;
     rclcpp::Publisher<std_msgs::msg::Int32MultiArray>::SharedPtr publisher_assistLevel;
     rclcpp::Publisher<std_msgs::msg::Int32MultiArray>::SharedPtr publisher_executionMode;
     rclcpp::Publisher<std_msgs::msg::Int16>::SharedPtr publisher_controlMode;
     
         
     // Funcion para convertir JointTrajectory a string (solo para mostrarla por el terminal)
-    std::string jointTrajectoryToString(const trajectory_msgs::msg::JointTrajectory::SharedPtr& joint_trajectory) {
+    std::string jointTrajectoryToString(const nimble_interfaces::msg::JointsTrajectory::SharedPtr& joints_trajectory) {
     
 	    std::stringstream ss;
 
 	    ss << "Joint Names: ";
-	    for (const auto& joint_name : joint_trajectory->joint_names) {
+	    for (const auto& joint_name : joints_trajectory->joint_trajectory.joint_names) {
 		ss << joint_name << " ";
 	    }
 	    ss << std::endl;
 
-	    for (const auto& point : joint_trajectory->points) {
+	    for (const auto& point : joints_trajectory->joint_trajectory.points) {
 		ss << "Point:" << std::endl;
 		ss << "  Positions: ";
 		for (const auto& position : point.positions) {
@@ -267,21 +268,21 @@ private:
         std::future_status status = result.wait_for(10s);  // timeout to guarantee a graceful finish
         if (status == std::future_status::ready) {
             RCLCPP_INFO(this->get_logger(), "Received response");
-            shared_data_.joints_target = result.get()->joints_target;
+            shared_data_.joints_trajectory = result.get()->joints_trajectory;
         }
     }
     
     //Callbacks, funciones asociadas a la recepcion de cada topic 
      
-    void call_back_joints_state(const sensor_msgs::msg::JointState & joint_state_msg) 
+    void call_back_joints_acc_state(const nimble_interfaces::msg::JointsTrajectory & joints_acc_state_msg) 
     {
-        shared_data_.joints_state = joint_state_msg;  //almacenamiento del mensaje en la estructura de datos
+        shared_data_.joints_acc_state = joints_acc_state_msg;  //almacenamiento del mensaje en la estructura de datos
         processData();   //llamada a la funcion de procesamiento
     }
     
-    void call_back_cartesian_target(const nimble_interfaces::msg::CartesianTrajectory & cartesian_target_msg) 
+    void call_back_cartesian_trajectory(const nimble_interfaces::msg::CartesianTrajectory & cartesian_trajectory_msg) 
     {
-        shared_data_.cartesian_target = cartesian_target_msg;
+        shared_data_.cartesian_trajectory = cartesian_trajectory_msg;
         processData();
     }
     void call_back_cartesian_state(const nimble_interfaces::msg::CartesianTrajectory & cartesian_state_msg) 
@@ -345,10 +346,10 @@ private:
     // Callback ejecutado cada cierto tiempo (eliminar si no se usa)
     void timer_callback()
   {
-     	 auto joints_target_msg = trajectory_msgs::msg::JointTrajectory();   //declarar mensaje con el tipo necesario
-      	 joints_target_msg=shared_data_.joints_target;   //Rellenar con la información correspondiente
-         joints_target_msg.header.stamp=now();   //header con el momento de publicacion
-    	 publisher_joints_target->publish(joints_target_msg);  //publicar
+     	 auto joints_trajectory_msg = nimble_interfaces::msg::JointsTrajectory();   //declarar mensaje con el tipo necesario
+      	 joints_trajectory_msg=shared_data_.joints_trajectory;   //Rellenar con la información correspondiente
+         joints_trajectory_msg.header.stamp=now();   //header con el momento de publicacion
+    	 publisher_joints_trajectory->publish(joints_trajectory_msg);  //publicar
     
   } 
     
