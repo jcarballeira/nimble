@@ -17,8 +17,8 @@ Control MSD de las articulaciones del Exo H3
 **Suscribed:**
 
 - `/joints_target` (nimble_interfaces/msg/JointsTrajectory)
-  - **Origen:** gait_control
-  - Objetivo actual de las articulaciones según fase de marcha
+  - **Origen:** states_machine
+  - Objetivo actual de las articulaciones publicado a periodo constante (segun velocidad caminata), incluye fase y vector ángulos.
 
 - `/joints_state` (sensor_msgs/msg/JointState)
   - **Origen:** Nodo_Simulink (H3)
