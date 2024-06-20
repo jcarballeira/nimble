@@ -21,7 +21,6 @@
    * [Control MSD](https://github.com/jcarballeira/nimble/blob/HMI/docs/Control_MSD.md)
    * [Control ZMP](https://github.com/jcarballeira/nimble/blob/HMI/docs/Control_ZMP.md)
    * [Frame](https://github.com/jcarballeira/nimble/blob/HMI/docs/frame.md)
-   * [Gait control](https://github.com/jcarballeira/nimble/blob/HMI/docs/gait_control.md)
    * [Gaming](https://github.com/jcarballeira/nimble/blob/HMI/docs/gaming.md)
    * [States machine](https://github.com/jcarballeira/nimble/blob/HMI/docs/states_machine.md)
    * [Nodo simulink](https://github.com/jcarballeira/nimble/blob/HMI/docs/simulink_node.md)
