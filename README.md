@@ -133,12 +133,15 @@ Ahora que cada cual haga sus chapuzas correspondientes en cada nodo. Salud y rep
 
 - Request 1: `measurements` (nimble_interfaces/msg/Measurements)
 * Request 2: `therapy_requirements` (nimble_interfaces/msg/TherapyRequirements)
-* Response: `joints_target` (trajectory_msgs/msg/JointTrajectory)
+* Response: `joints_trajectory` (trajectory_msgs/msg/JointTrajectory)
 
 #### nimble_interfaces/src/Cartesian full trajectory_
 
 - `std_msgs/Header header`
 * `geometry_msgs/Point[] left_pelvis`
+  * `float64 x`
+  * `float64 y`
+  * `float64 z` 
 * `geometry_msgs/Point[] right_pelvis`
 * `geometry_msgs/Point[] base_pelvis`
 * `geometry_msgs/Point[] left_hip`
