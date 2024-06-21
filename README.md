@@ -16,7 +16,7 @@
 
 3. [Nodos](#nodos)
    * [HMI](https://github.com/jcarballeira/nimble/blob/HMI/docs/hmi.md)
-   * [Modelo cinemático](https://github.com/jcarballeira/nimble/blob/HMI/docs/kinetik_model.md)
+   * [Modelo cinemático](https://github.com/jcarballeira/nimble/blob/HMI/docs/kinematic_model.md)
    * [Cables robot](https://github.com/jcarballeira/nimble/blob/HMI/docs/cables_robot.md)
    * [Control MSD](https://github.com/jcarballeira/nimble/blob/HMI/docs/Control_MSD.md)
    * [Control ZMP](https://github.com/jcarballeira/nimble/blob/HMI/docs/Control_ZMP.md)
