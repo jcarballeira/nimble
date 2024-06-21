@@ -1,4 +1,4 @@
-# Kinetic model
+# Kinematic model
 
 <div align="center">
     <img width=100px src="https://img.shields.io/badge/lenguage-%20c++-blue" alt="Python">
@@ -15,7 +15,7 @@ Paso de espacio articular a cartesiano del Exo, obteniendo posiciones xyz del ma
 
 **Suscribed:**
 
-- `/joints_target` (trajectory_msgs/msg/JointTrajectory)
+- `/joints_trajectory` (trajectory_msgs/msg/JointTrajectory)
   - **Origen:** states_machin
   - Trayectoria articular ideal
 
@@ -33,7 +33,7 @@ Paso de espacio articular a cartesiano del Exo, obteniendo posiciones xyz del ma
 
 **Publishes:**
 
-- `/cartesian_target` (nimble_interfaces/msg/CartesianFullTrajectory)
+- `/cartesian_trajectory` (nimble_interfaces/msg/CartesianFullTrajectory)
   - Posiciones xyz para toda la trayectoria ideal tanto de la pelvis como del maleolo.
 
 - `/cartesian_state` (nimble_interfaces/msg/CartesianFullTrajectory)
