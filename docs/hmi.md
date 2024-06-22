@@ -14,7 +14,7 @@ Publicar periódicamente las medidas del paciente y los requisitos de la terapia
 ## Topics
 * **Suscripciones:**
 
-  * `/cartesian_full_target` (nimble_interfaces/msg/CartesianFullTrajectory)
+  * `/cartesian_trajectory` (nimble_interfaces/msg/CartesianTrajectory)
     - Recrea la ruta que se le pasa al paciente.
   
   * `/cartesian_state` (nimble_interfaces/msg/CartesianFullTrajectory)
