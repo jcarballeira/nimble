@@ -16,11 +16,11 @@ Publicar periódicamente las medidas del paciente y los requisitos de la terapia
 
   * `/cartesian_trajectory` (nimble_interfaces/msg/CartesianTrajectory)
     - **Origen:** kinematic model
-    - Recrea la ruta que se le pasa al paciente.
+    - Recreacion ruta cartesiana ideal.
   
   * `/cartesian_state` (nimble_interfaces/msg/CartesianFullTrajectory)
     - **Origen:** kinematic model 
-    - Se utiliza para mostrar la posición acutal del exo.  
+    - Recreacion posicion cartesiana real del exo.  
   
 * **Publicaciones:**
 
